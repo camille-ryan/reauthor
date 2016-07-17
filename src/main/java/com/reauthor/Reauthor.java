@@ -4,7 +4,6 @@ package com.reauthor;
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
 import org.deeplearning4j.models.word2vec.Word2Vec;
 import org.deeplearning4j.models.word2vec.wordstore.VocabCache;
-import org.deeplearning4j.models.word2vec.wordstore.inmemory.AbstractCache;
 import org.deeplearning4j.text.sentenceiterator.CollectionSentenceIterator;
 import org.deeplearning4j.text.sentenceiterator.SentenceIterator;
 import org.deeplearning4j.text.tokenization.tokenizer.preprocessor.CommonPreprocessor;
@@ -15,7 +14,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 
 /**
@@ -24,9 +22,9 @@ import java.util.Collection;
 public class Reauthor {
     public static void main(String[] args) throws Exception {
         Word2Vec vec = WordVectorSerializer.loadFullModel("fittedmodel.txt");
-        double[] wordProbs = getWordProbs("lovecraft", vec);
+        double[] wordProbs = getWordProbs("dickens", vec);
 
-        File sampleFile = new File("/Users/ryanbrady/lanthack/reauthor/target/classes/dickens - tale of two cities.txt");
+        File sampleFile = new File("/Users/ryanbrady/lanthack/reauthor/target/classes/lovecraft - the shunned house.txt");
         ArrayList<String> sample = gutenberg(sampleFile);
 
 
@@ -39,7 +37,16 @@ public class Reauthor {
                 String replacement = token;
 
                 for(String candidate : vec.wordsNearest(token, 9)) {
-                    double thisProb = Math.random() + vec.similarity(candidate, token);
+                    double thisProb =  vec.similarity(candidate, token);
+                    int wordindex = 0;
+                    for(String word : vec.getVocab().words()){
+                        if(word.equals(candidate)){
+                            thisProb = thisProb * wordProbs[wordindex] / (1 + wordProbs[wordindex]);
+                        }
+                        wordindex++;
+                    }
+                    thisProb += Math.random();
+
                     if(thisProb > prob) {
                         prob = thisProb;
                         replacement = candidate;
@@ -55,8 +62,7 @@ public class Reauthor {
 
 
             }
-            System.out.println(sampleLine);
-            System.out.println(sb.toString());
+            System.out.println("|" + sampleLine + "|" + sb.toString() + "|");
         }
 
 
@@ -96,7 +102,7 @@ public class Reauthor {
                         builder.append(" ");
                     }
                 }
-                String[] text = builder.toString().split("[.?!]");
+                String[] text = builder.toString().split("[\\n]");
                 for(String sentence : text) {
                     items.add(sentence);
                 }

@@ -1,22 +1,18 @@
 package com.reauthor;
 
-import org.canova.api.util.ClassPathResource;
 import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
 import org.deeplearning4j.models.word2vec.Word2Vec;
-import org.deeplearning4j.text.sentenceiterator.BasicLineIterator;
-import org.deeplearning4j.text.sentenceiterator.CollectionSentenceIterator;
-import org.deeplearning4j.text.sentenceiterator.FileSentenceIterator;
-import org.deeplearning4j.text.sentenceiterator.SentenceIterator;
+import org.deeplearning4j.text.sentenceiterator.*;
 import org.deeplearning4j.text.tokenization.tokenizer.preprocessor.CommonPreprocessor;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.DefaultTokenizerFactory;
 import org.deeplearning4j.text.tokenization.tokenizerfactory.TokenizerFactory;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.BufferedReader;
 import java.io.FileReader;
-
-import java.io.FileInputStream;
 import java.util.Collection;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,8 +35,10 @@ public class LearnVectorRepresentations {
         }
 
         log.info("Load & Vectorize Sentences....");
+
         // Strip white space before and after for each line
-        SentenceIterator iter = new CollectionSentenceIterator(text);
+        SentenceIterator iter = UimaSentenceIterator.createWithPath("/Users/ryanbrady/lanthack/reauthor/target/classes/");
+
 
         // Split on white spaces in the line to get words
         TokenizerFactory t = new DefaultTokenizerFactory();
