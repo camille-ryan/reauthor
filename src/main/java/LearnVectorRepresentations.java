@@ -63,7 +63,7 @@ public class LearnVectorRepresentations {
         log.info("Writing word vectors to text file....");
 
         // Write word vectors
-        WordVectorSerializer.writeFullModel(vec, "fittedmodel/");
+        WordVectorSerializer.writeFullModel(vec, "fittedmodel.txt");
 
         log.info("Closest Words:");
         Collection<String> lst = vec.wordsNearest("thought", 10);
@@ -95,11 +95,19 @@ public class LearnVectorRepresentations {
             else {
                 StringBuilder builder = new StringBuilder();
                 for (String value : paragraph) {
-                    builder.append(value);
-                    builder.append(" ");
+                    // deal with broken words across lines.
+                    if(value.substring(value.length()-1) == "-"){
+                        builder.append(value.substring(0, value.length()-2));
+                    }
+                    else {
+                        builder.append(value);
+                        builder.append(" ");
+                    }
                 }
-                String text = builder.toString();
-                items.add(text);
+                String[] text = builder.toString().split("[.?!-=_]");
+                for(String sentence : text) {
+                    items.add(sentence);
+                }
                 paragraph.clear();
             }
 
